@@ -11,7 +11,7 @@ import { ApplicantsService } from './applicants.service';
 import { CreateApplicantDto } from './dto/create-applicant.dto';
 import { UpdateApplicantDto } from './dto/update-applicant.dto';
 
-@Controller('applicants')
+@Controller('api/applicants')
 export class ApplicantsController {
   constructor(private readonly applicantsService: ApplicantsService) {}
 
@@ -32,7 +32,7 @@ export class ApplicantsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.applicantsService.findOne(+id);
+    return this.applicantsService.findOne(id);
   }
 
   @Patch(':id')
@@ -40,11 +40,11 @@ export class ApplicantsController {
     @Param('id') id: string,
     @Body() updateApplicantDto: UpdateApplicantDto,
   ) {
-    return this.applicantsService.update(+id, updateApplicantDto);
+    return this.applicantsService.update(id, updateApplicantDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.applicantsService.remove(+id);
+    return this.applicantsService.remove(id);
   }
 }
