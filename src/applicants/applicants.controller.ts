@@ -6,11 +6,16 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApplicantsService } from './applicants.service';
 import { CreateApplicantDto } from './dto/create-applicant.dto';
 import { UpdateApplicantDto } from './dto/update-applicant.dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { FindApplicantsDto } from './dto/find-applicants.dto';
 
+@UseGuards(JwtAuthGuard)
 @Controller('api/applicants')
 export class ApplicantsController {
   constructor(private readonly applicantsService: ApplicantsService) {}
@@ -26,8 +31,8 @@ export class ApplicantsController {
   }
 
   @Get()
-  findAll() {
-    return this.applicantsService.findAll();
+  findAll(@Query() query: FindApplicantsDto) {
+    return this.applicantsService.findAll(query);
   }
 
   @Get(':id')

@@ -7,6 +7,8 @@ import { CreateApplicantDto } from './dto/create-applicant.dto';
 import { UpdateApplicantDto } from './dto/update-applicant.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { Prisma } from 'src/generated/prisma/client';
+import { FindApplicantsDto } from './dto/find-applicants.dto';
+import { PaginatedResult } from 'src/common/interfaces/paginated-result.interface';
 
 const activeFilter = { deletedAt: null };
 @Injectable()
@@ -33,8 +35,68 @@ export class ApplicantsService {
     }
   }
 
-  async findAll() {
-    return await this.prisma.applicant.findMany({ where: activeFilter });
+  async findAll(query: FindApplicantsDto): Promise<PaginatedResult<any>> {
+    const page = query?.page ?? 1;
+    const limit = query?.limit ?? 10;
+    const search = query?.search;
+    const status = query?.status;
+    const track = query?.track;
+    const sortBy = query?.sortBy ?? 'createdAt';
+    const sortOrder = query?.sortOrder ?? 'desc';
+
+    const take = limit;
+    const skip = (page - 1) * limit;
+
+    const where: Prisma.ApplicantWhereInput = {
+      ...activeFilter,
+    };
+
+    const andConditions: Prisma.ApplicantWhereInput[] = [];
+
+    if (search) {
+      andConditions.push({
+        OR: [
+          { name: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+        ],
+      });
+    }
+
+    if (status) {
+      andConditions.push({ status });
+    }
+
+    if (track) {
+      andConditions.push({ track });
+    }
+
+    if (andConditions.length > 0) {
+      where.AND = andConditions;
+    }
+
+    const [total, data] = await Promise.all([
+      this.prisma.applicant.count({ where }),
+      this.prisma.applicant.findMany({
+        where,
+        skip,
+        take,
+        orderBy: {
+          [sortBy]: sortOrder,
+        },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit) || 0;
+
+    return {
+      data,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
   }
 
   async findOne(id: string) {
