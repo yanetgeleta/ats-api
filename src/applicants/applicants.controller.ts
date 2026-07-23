@@ -14,6 +14,8 @@ import { CreateApplicantDto } from './dto/create-applicant.dto';
 import { UpdateApplicantDto } from './dto/update-applicant.dto';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { FindApplicantsDto } from './dto/find-applicants.dto';
+import { UpdateStatusDto } from './dto/update-status.dto';
+import { UpdateNotesDto } from './dto/update-notes.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('api/applicants')
@@ -51,5 +53,18 @@ export class ApplicantsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.applicantsService.remove(id);
+  }
+
+  @Patch(':id/status')
+  updateStatus(
+    @Param('id') id: string,
+    @Body() updateStatusDto: UpdateStatusDto,
+  ) {
+    return this.applicantsService.updateStatus(id, updateStatusDto);
+  }
+
+  @Patch(':id/notes')
+  updateNotes(@Param('id') id: string, @Body() updateNotesDto: UpdateNotesDto) {
+    return this.applicantsService.updateNotes(id, updateNotesDto);
   }
 }

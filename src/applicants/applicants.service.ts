@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -6,9 +7,11 @@ import {
 import { CreateApplicantDto } from './dto/create-applicant.dto';
 import { UpdateApplicantDto } from './dto/update-applicant.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Prisma } from 'src/generated/prisma/client';
+import { ApplicationStatus, Prisma } from 'src/generated/prisma/client';
 import { FindApplicantsDto } from './dto/find-applicants.dto';
 import { PaginatedResult } from 'src/common/interfaces/paginated-result.interface';
+import { UpdateStatusDto } from './dto/update-status.dto';
+import { UpdateNotesDto } from './dto/update-notes.dto';
 
 const activeFilter = { deletedAt: null };
 @Injectable()
@@ -123,6 +126,45 @@ export class ApplicantsService {
     return this.prisma.applicant.update({
       where: { id },
       data: { deletedAt: new Date() },
+    });
+  }
+
+  INVALID_TRANSITIONS: Record<ApplicationStatus, ApplicationStatus[]> = {
+    [ApplicationStatus.REJECTED]: [
+      ApplicationStatus.ACCEPTED,
+      ApplicationStatus.SHORTLISTED,
+    ],
+    [ApplicationStatus.ACCEPTED]: [ApplicationStatus.PENDING],
+    [ApplicationStatus.PENDING]: [],
+    [ApplicationStatus.SHORTLISTED]: [],
+  };
+
+  async updateStatus(id: string, updateStatusDto: UpdateStatusDto) {
+    // find the applicant with the id, check if the status transition we are asking for is forbidden
+    // if not, update the database with the new status
+    const applicant = await this.findOne(id);
+
+    const currentStatus = applicant.status;
+
+    const forbiddenTargets = this.INVALID_TRANSITIONS[currentStatus] || [];
+    if (forbiddenTargets.includes(updateStatusDto.status)) {
+      throw new BadRequestException(
+        `Invalid status transition: Cannot change applicant status from ${currentStatus} to ${updateStatusDto.status}.`,
+      );
+    }
+
+    return this.prisma.applicant.update({
+      where: { id },
+      data: { status: updateStatusDto.status },
+    });
+  }
+
+  async updateNotes(id: string, updateNotesDto: UpdateNotesDto) {
+    await this.findOne(id);
+
+    return this.prisma.applicant.update({
+      where: { id },
+      data: { notes: updateNotesDto.notes ?? null },
     });
   }
 }
