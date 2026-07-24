@@ -108,14 +108,41 @@ This API is built using NestJS's modular conventions, separating features into i
 To prevent invalid administrative evaluations, a strict state-machine guard is enforced on `PATCH /api/applicants/:id/status`:
 
 - Forbidden: Rejected → Accepted
-- Forbidden/Allowed?: Rejected → Shortlisted
-- Forbidden/Allowed?: Accepted → Pending
+- Forbidden: Rejected → Shortlisted
+- Forbidden: Accepted → Pending
 
 Attempting a forbidden transition returns a `400 Bad Request` with an explicit description of the violation. All other transitions (e.g., Pending → Shortlisted, Pending → Rejected) are supported.
 
 ### 2. Known Scoping Limitations
 
 - **Email collision on re-creation**: The `Applicant` table enforces a unique constraint on `email`. Because soft-deleted applicants remain in the database with their unique email intact, you cannot create a new applicant with the same email as a soft-deleted one — doing so returns a `409 Conflict`. This is a deliberate scoping decision rather than an oversight: restoring a soft-deleted applicant on re-creation was considered and deferred as a possible future enhancement.
+
+## 🤖 AI-Powered Resume Parsing
+
+As an additional feature beyond the core requirements, this API supports extracting applicant details directly from a resume PDF using Groq's `openai/gpt-oss-120b` model, with output strictly validated against a Zod schema before being returned.
+
+### How It Works
+
+1. An admin uploads a resume PDF via `POST /api/applicants/parse-resume`.
+2. The PDF's text is extracted server-side.
+3. The extracted text is sent to Groq, which returns structured JSON (`name`, `email`, `phone`).
+4. The response is validated against a strict Zod schema — if the AI's output doesn't match the expected shape (e.g., missing a required field), the endpoint returns a clean `400 Bad Request` rather than passing malformed data through.
+5. The admin reviews the extracted fields, manually adds the `track` (which cannot be inferred from a resume), and submits the combined data to the existing `POST /api/applicants` endpoint.
+
+This is a deliberately two-step flow rather than a fully automatic "upload and create": it lets an admin confirm AI-extracted data before it enters the database, and keeps the resume-parsing logic fully decoupled from the existing, independently tested applicant-creation logic.
+
+### Trying It in Swagger
+
+1. Authenticate as usual (see Authentication & API Usage above).
+2. Expand `POST /api/applicants/parse-resume`, click **Try it out**.
+3. Choose a PDF file and click **Execute**.
+4. Copy the returned `name`, `email`, and `phone` into a `POST /api/applicants` request, adding a `track` of your choice.
+
+Sample resume PDFs for testing are available in the `/samples` directory.
+
+### Setup Requirement
+
+Add a Groq API key to your `.env` (see `.env.example`):
 
 ## 🧪 Automated Testing
 

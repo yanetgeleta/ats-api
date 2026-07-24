@@ -6,6 +6,7 @@ import { ApplicantsModule } from './applicants/applicants.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ResumeParserModule } from './resume-parser/resume-parser.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     ApplicantsModule,
     AuthModule,
     DashboardModule,
+    ResumeParserModule,
   ],
   controllers: [AppController],
   providers: [AppService],
