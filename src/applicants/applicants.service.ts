@@ -18,11 +18,6 @@ const activeFilter = { deletedAt: null };
 export class ApplicantsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  // this is just for test
-  async getApplicantsTest() {
-    return this.prisma.applicant.findMany();
-  }
-
   async create(createApplicantDto: CreateApplicantDto) {
     try {
       return await this.prisma.applicant.create({ data: createApplicantDto });
