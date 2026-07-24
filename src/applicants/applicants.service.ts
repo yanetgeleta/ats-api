@@ -6,12 +6,12 @@ import {
 } from '@nestjs/common';
 import { CreateApplicantDto } from './dto/create-applicant.dto';
 import { UpdateApplicantDto } from './dto/update-applicant.dto';
-import { PrismaService } from 'src/prisma/prisma.service';
-import { ApplicationStatus, Prisma } from 'src/generated/prisma/client';
 import { FindApplicantsDto } from './dto/find-applicants.dto';
 import { PaginatedResult } from 'src/common/interfaces/paginated-result.interface';
 import { UpdateStatusDto } from './dto/update-status.dto';
 import { UpdateNotesDto } from './dto/update-notes.dto';
+import { ApplicationStatus, Prisma } from 'src/generated/prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 const activeFilter = { deletedAt: null };
 @Injectable()

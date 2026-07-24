@@ -1,5 +1,6 @@
 allowBuilds:
   '@prisma/engines': true
+  '@scarf/scarf': set this to true or false
   argon2: true
   bcrypt: set this to true or false
   esbuild: true

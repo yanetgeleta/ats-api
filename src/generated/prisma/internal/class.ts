@@ -12,7 +12,7 @@
  */
 
 import * as runtime from "@prisma/client/runtime/client"
-import type * as Prisma from "./prismaNamespace.js"
+import type * as Prisma from "./prismaNamespace"
 
 
 const config: runtime.GetPrismaClientConfig = {
@@ -20,7 +20,7 @@ const config: runtime.GetPrismaClientConfig = {
   "clientVersion": "7.8.0",
   "engineVersion": "3c6e192761c0362d496ed980de936e2f3cebcd3a",
   "activeProvider": "postgresql",
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Get a free hosted Postgres database in seconds: `npx create-db`\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\ngenerator client {\n  provider     = \"prisma-client\"\n  output       = \"../src/generated/prisma\"\n  moduleFormat = \"cjs\"\n}\n\nenum Role {\n  ADMIN\n}\n\nenum ApplicationStatus {\n  PENDING\n  SHORTLISTED\n  ACCEPTED\n  REJECTED\n}\n\nenum InternshipTrack {\n  FRONT_END_WEB_DEVELOPMENT\n  BACK_END_DEVELOPMENT\n  MOBILE_DEVELOPMENT\n  UI_UX_DESIGN\n  DATA_ANALYTICS\n}\n\nmodel Admin {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  password  String\n  name      String\n  role      Role     @default(ADMIN)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Applicant {\n  id        String            @id @default(uuid())\n  name      String\n  email     String            @unique\n  phone     String?\n  status    ApplicationStatus @default(PENDING)\n  track     InternshipTrack\n  notes     String?           @db.VarChar(1000)\n  deletedAt DateTime?\n  createdAt DateTime          @default(now())\n  updatedAt DateTime          @updatedAt\n\n  @@index([deletedAt])\n}\n",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Get a free hosted Postgres database in seconds: `npx create-db`\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\ngenerator client {\n  provider            = \"prisma-client\"\n  output              = \"../src/generated/prisma\"\n  moduleFormat        = \"cjs\"\n  importFileExtension = \"\"\n}\n\nenum Role {\n  ADMIN\n}\n\nenum ApplicationStatus {\n  PENDING\n  SHORTLISTED\n  ACCEPTED\n  REJECTED\n}\n\nenum InternshipTrack {\n  FRONT_END_WEB_DEVELOPMENT\n  BACK_END_DEVELOPMENT\n  MOBILE_DEVELOPMENT\n  UI_UX_DESIGN\n  DATA_ANALYTICS\n}\n\nmodel Admin {\n  id        String   @id @default(uuid())\n  email     String   @unique\n  password  String\n  name      String\n  role      Role     @default(ADMIN)\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Applicant {\n  id        String            @id @default(uuid())\n  name      String\n  email     String            @unique\n  phone     String?\n  status    ApplicationStatus @default(PENDING)\n  track     InternshipTrack\n  notes     String?           @db.VarChar(1000)\n  deletedAt DateTime?\n  createdAt DateTime          @default(now())\n  updatedAt DateTime          @updatedAt\n\n  @@index([deletedAt])\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
